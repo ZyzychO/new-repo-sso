@@ -28,6 +28,6 @@ ignore:
 rbac:
   content: 
     folder/**:
-      authenticated: read
+      oleksall: read
 reunite:
   ignoreLint: true
