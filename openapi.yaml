@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: API with Multiple Discriminator Options
+  version: 1.0.0
+
+paths:
+  /vehicles:
+    post:
+      summary: Add a new vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+      responses:
+        '200':
+          description: Vehicle added successfully
+
+components:
+  schemas:
+    Vehicle:
+      type: object
+      required:
+        - vehicleType
+      discriminator:
+        propertyName: vehicleType
+        mapping:
+          car: '#/components/schemas/Car'
+          truck: '#/components/schemas/Truck'
+          motorcycle: '#/components/schemas/Motorcycle'
+          bicycle: '#/components/schemas/Bicycle'
+          scooter: '#/components/schemas/Scooter'
+          bus: '#/components/schemas/Bus'
+      oneOf:
+        - $ref: '#/components/schemas/Car'
+        - $ref: '#/components/schemas/Truck'
+        - $ref: '#/components/schemas/Motorcycle'
+        - $ref: '#/components/schemas/Bicycle'
+        - $ref: '#/components/schemas/Scooter'
+        - $ref: '#/components/schemas/Bus'
+      properties:
+        vehicleType:
+          type: string
+          description: Type of vehicle
+
+    Car:
+      type: object
+      required:
+        - vehicleType
+        - numberOfDoors
+      properties:
+        vehicleType:
+          type: string
+          enum:
+            - car
+        numberOfDoors:
+          type: integer
+
+    Truck:
+      type: object
+      required:
+        - vehicleType
+        - payloadCapacity
+      properties:
+        vehicleType:
+          type: string
+          enum:
+            - truck
+        payloadCapacity:
+          type: number
+          format: float
+
+    Motorcycle:
+      type: object
+      required:
+        - vehicleType
+        - hasSidecar
+      properties:
+        vehicleType:
+          type: string
+          enum:
+            - motorcycle
+        hasSidecar:
+          type: boolean
+
+    Bicycle:
+      type: object
+      required:
+        - vehicleType
+        - gearCount
+      properties:
+        vehicleType:
+          type: string
+          enum:
+            - bicycle
+        gearCount:
+          type: integer
+
+    Scooter:
+      type: object
+      required:
+        - vehicleType
+        - maxSpeed
+      properties:
+        vehicleType:
+          type: string
+          enum:
+            - scooter
+        maxSpeed:
+          type: integer
+          description: Maximum speed in km/h
+
+    Bus:
+      type: object
+      required:
+        - vehicleType
+        - seatingCapacity
+      properties:
+        vehicleType:
+          type: string
+          enum:
+            - bus
+        seatingCapacity:
+          type: integer
