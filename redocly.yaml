@@ -31,3 +31,5 @@ rbac:
       oleksall: read
 reunite:
   ignoreLint: true
+sso:
+  - REDOCLY
