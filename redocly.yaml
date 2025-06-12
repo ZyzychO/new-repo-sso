@@ -28,48 +28,9 @@ ignore:
 rbac:
   content:
     '**':
-      redocly.admin: admin
-      redocly.members: maintain
+      authenticated: read
       anonymous: none
-    'index.md':
-      authenticated: read
-      redocly.members: maintain
-    'docs/**/*.md':
-      authenticated: read
-      redocly.members: maintain
-    'images/**/*':
-      authenticated: read
-      redocly.members: maintain
-    'api/hl.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/event-sor.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/incidents.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/engine-sor.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/ablist.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/sensor-sor.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/llm-proxy.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/vector-sor.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/scanning+analysis/model-scanner.yaml':
-      authenticated: read
-      redocly.members: maintain
-    'api/access-api.yaml':
-      authenticated: read
-      redocly.members: maintain
+
 reunite:
   ignoreLint: true
 sso:
