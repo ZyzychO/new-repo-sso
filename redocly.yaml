@@ -27,9 +27,13 @@ ignore:
   - .github
 rbac:
   content: 
+    '**':
+      authenticated: read
+      anonymous: none
     folder/**:
       oleksall: read
 reunite:
   ignoreLint: true
 sso:
   - REDOCLY
+
