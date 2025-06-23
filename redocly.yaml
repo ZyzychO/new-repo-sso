@@ -12,3 +12,7 @@ rbac:
       redocly.admin: admin
       redocly.members: maintain
       anonymous: none
+      test24: admin
+  reunite:
+    test24: admin
+
