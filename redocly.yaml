@@ -14,5 +14,4 @@ rbac:
       anonymous: none
       test24: admin
   reunite:
-    test24: admin
-
+    'test24': admin
