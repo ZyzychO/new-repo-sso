@@ -1,17 +1,5 @@
 apis:
   internal@v1:
     root: openapi.yaml
-    output: v1/bundled.yaml
-  external@v2:
-    root: openapi.yaml
     decorators:
-      remove-x-internal: on
-rbac:
-  content:
-    '**':
-      redocly.admin: admin
-      redocly.members: maintain
-      anonymous: none
-      test24: admin
-  reunite:
-    'test24': admin
+      remove-x-internal: '{{process.env.REMOVE_X_INTERNAL}}'
