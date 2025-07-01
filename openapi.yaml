@@ -74,7 +74,7 @@ paths:
           $ref: '#/components/responses/errors-response'
   /crimes/{crime-id}:
     delete:
-      x-interal: true
+      x-internal: true
       parameters:
         - $ref: '#/components/parameters/x-correlation-id'
         - $ref: '#/components/parameters/x-force-id'
