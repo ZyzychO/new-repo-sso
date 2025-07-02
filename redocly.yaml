@@ -2,4 +2,4 @@ apis:
   internal@v1:
     root: openapi.yaml
     decorators:
-      remove-x-internal: '{{process.env.REMOVE_X_INTERNAL}}'
+      remove-x-internal: '{{process.env.MY_TEST_VAR}}'
