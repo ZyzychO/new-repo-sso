@@ -1,1222 +1,717 @@
 openapi: 3.1.0
 info:
-  version: 0.0.4
-  title: NMPP Force API
+  title: Redocly Museum API
+  description: test
+  version: 1.1.2
+  termsOfService: 'https://redocly.com/subscription-agreement/'
   contact:
-    name: SOH API Support
-    email: soh-.servicemanagement@met.police.uk
-    url: https://docs.ihub.police.uk
-  description: NMPP Force Integration OAS API Specification
-  summary: >
-    ![Beta](https://img.shields.io/badge/Status-Beta-yellow)
-        
-    The NMPP Force Integration API allows for forces to integrate with the
-    National My Police Portal. 
-
-
-    The initial release of this API will allow forces to:
-
-
-    - Send crimes that members of the public can add to their profile
-
-    - Send messages to member of the public
-
-    - Receive messages from members of the public
-
-    - Receive events about changes to a member of public's profile
-  x-metadata:
-    x-internal: false
-    apiLayer: Experience
-    apiType: OAS
-    scope: NMPP
+    email: team@redocly.com
+    url: "https://redocly.com/docs/cli/"
+  license:
+    name: MIT
+    url: "https://opensource.org/license/mit/"
 servers:
-  - url: https://api.{env}.ihub.police.uk/e-nmpp-force/v1
-    description: Non Prod Servers
+  - url: "{server}"
     variables:
-      env:
-        default: dev
-        enum:
-          - dev
-          - test
-          - pp
-  - url: https://api.ihub.police.uk/e-nmpp-force/v1
-    description: Production
-security:
-  - basicAuth: []
+      server:
+        default: https://google.com
+        description: The base server URL.
 paths:
-  /crimes:
-    post:
-      parameters:
-        - $ref: '#/components/parameters/x-correlation-id'
-        - $ref: '#/components/parameters/x-force-id'
-      operationId: create-crime
-      summary: Creates a crime in National My Police Portal
-      description: >
-        Creates a crime in the NMPP crime store. Members of public can match to
-        this by providing the matching profile data
-
-        and attempting a case matching process.
-      tags:
-        - Crimes
-      requestBody:
-        $ref: '#/components/requestBodies/create-crime-request'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-          $ref: '#/components/responses/errors-response'
-        '401':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '500':
-          description: Internal Server Error
-          $ref: '#/components/responses/errors-response'
-  /crimes/{crime-id}:
-    delete:
-      x-internal: true
-      parameters:
-        - $ref: '#/components/parameters/x-correlation-id'
-        - $ref: '#/components/parameters/x-force-id'
-        - $ref: '#/components/parameters/crime-id'
-      operationId: delete-crime
-      summary: Deletes a crime from NMPP
-      tags:
-        - Crimes
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Bad Request
-          $ref: '#/components/responses/errors-response'
-        '401':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '403':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '404':
-          description: Not Found
-          $ref: '#/components/responses/errors-response'
-        '500':
-          description: Internal Server Error
-          $ref: '#/components/responses/errors-response'
-  /crimes/{crime-id}/events:
-    post:
-      parameters:
-        - $ref: '#/components/parameters/x-correlation-id'
-        - $ref: '#/components/parameters/x-force-id'
-        - $ref: '#/components/parameters/crime-id'
-      operationId: create-crime-message
-      summary: Creates an message event on the crime
-      tags:
-        - Messages
-      requestBody:
-        $ref: '#/components/requestBodies/create-message-request'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-          $ref: '#/components/responses/errors-response'
-        '401':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '403':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '404':
-          description: Not Found
-          $ref: '#/components/responses/errors-response'
-        '500':
-          description: Internal Server Error
-          $ref: '#/components/responses/errors-response'
-  /events:
+  /museum-hours:
     get:
-      parameters:
-        - $ref: '#/components/parameters/x-correlation-id'
-        - $ref: '#/components/parameters/page-size'
-      operationId: get-force-events
-      summary: Gets events for crimes and profiles in the force's event queue
+      summary: Get museum hours
+      description: Get upcoming museum operating hours.
+      operationId: getMuseumHours
       tags:
-        - Events
-      responses:
-        '200':
-          description: OK
-          $ref: '#/components/responses/events-response'
-        '400':
-          description: Bad Request
-          $ref: '#/components/responses/errors-response'
-        '401':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '500':
-          description: Internal Server Error
-          $ref: '#/components/responses/errors-response'
-  /events/{event-id}:
-    delete:
+        - Operations
       parameters:
-        - $ref: '#/components/parameters/x-correlation-id'
-        - $ref: '#/components/parameters/x-force-id'
-        - $ref: '#/components/parameters/event-id'
-      operationId: delete-event
-      summary: Deletes the event from the force's events queue
-      description: >
-        Confirms receipt and processing of the event and deletes it from the
-        force queue. 
-
-
-        If an event is not confirmed it will appear in a subsequent call to
-        `/events`
+        - $ref: "#/components/parameters/StartDate"
+        - $ref: "#/components/parameters/PaginationPage"
+        - $ref: "#/components/parameters/PaginationLimit"
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMuseumHoursResponse"
+              examples:
+                default_example:
+                  $ref: "#/components/examples/GetMuseumHoursResponseExample"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /special-events:
+    post:
+      summary: Create special events
+      description: Creates a new special event for the museum.
+      operationId: createSpecialEvent
       tags:
         - Events
       requestBody:
-        $ref: '#/components/requestBodies/delete-event-request'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSpecialEventRequest"
+            examples:
+              default_example:
+                $ref: "#/components/examples/CreateSpecialEventRequestExample"
       responses:
-        '200':
-          description: Success
-          $ref: '#/components/responses/events-response'
-        '400':
-          description: Bad Request
-          $ref: '#/components/responses/errors-response'
-        '401':
-          description: Unauthorized
-          $ref: '#/components/responses/errors-response'
-        '403':
-          description: Forbidden
-          $ref: '#/components/responses/errors-response'
-        '500':
-          description: Internal Server Error
-          $ref: '#/components/responses/errors-response'
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialEventResponse"
+              examples:
+                default_example:
+                  $ref: "#/components/examples/CreateSpecialEventResponseExample"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    get:
+      summary: List special events
+      description: Return a list of upcoming special events at the museum.
+      operationId: listSpecialEvents
+      tags:
+        - Events
+      parameters:
+        - $ref: "#/components/parameters/StartDate"
+        - $ref: "#/components/parameters/EndDate"
+        - $ref: "#/components/parameters/PaginationPage"
+        - $ref: "#/components/parameters/PaginationLimit"
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListSpecialEventsResponse"
+              examples:
+                default_example:
+                  $ref: "#/components/examples/ListSpecialEventsResponseExample"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /special-events/{eventId}:
+    get:
+      summary: Get special event
+      description: Get details about a special event.
+      operationId: getSpecialEvent
+      tags:
+        - Events
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialEventResponse"
+              examples:
+                default_example:
+                  $ref: "#/components/examples/GetSpecialEventResponseExample"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update special event
+      description: Update the details of a special event.
+      operationId: updateSpecialEvent
+      tags:
+        - Events
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSpecialEventRequest"
+            examples:
+              default_example:
+                $ref: "#/components/examples/UpdateSpecialEventRequestExample"
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialEventResponse"
+              examples:
+                default_example:
+                  $ref: "#/components/examples/UpdateSpecialEventResponseExample"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete special event
+      description: Delete a special event from the collection. Allows museum to cancel planned events.
+      operationId: deleteSpecialEvent
+      tags:
+        - Events
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "204":
+          description: Success - no content.
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /tickets:
+    post:
+      summary: Buy museum tickets
+      description: Purchase museum tickets for general entry or special events.
+      operationId: buyMuseumTickets
+      tags:
+        - Tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BuyMuseumTicketsRequest"
+            examples:
+              general_entry:
+                $ref: "#/components/examples/BuyGeneralTicketsRequestExample"
+              event_entry:
+                $ref: "#/components/examples/BuyEventTicketsRequestExample"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BuyMuseumTicketsResponse"
+              examples:
+                general_entry:
+                  $ref: "#/components/examples/BuyGeneralTicketsResponseExample"
+                event_entry:
+                  $ref: "#/components/examples/BuyEventTicketsResponseExample"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /tickets/{ticketId}/qr:
+    get:
+      summary: Get ticket QR code
+      description: Return an image of your ticket with scannable QR code. Used for event entry.
+      operationId: getTicketCode
+      tags:
+        - Tickets
+      parameters:
+        - $ref: "#/components/parameters/TicketId"
+      responses:
+        "200":
+          description: Scannable event ticket in image format.
+          content:
+            image/png:
+              schema:
+                $ref: "#/components/schemas/GetTicketCodeResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
 components:
+  schemas:
+    TicketType:
+      description: Type of ticket being purchased. Use `general` for regular museum entry and `event` for tickets to special events.
+      type: string
+      enum:
+        - event
+        - general
+      example: event
+    Date:
+      type: string
+      format: date
+      example: '2023-10-29'
+    Email:
+      description: Email address for ticket purchaser.
+      type: string
+      format: email
+      example: museum-lover@example.com
+    Phone:
+      description: Phone number for the ticket purchaser (optional).
+      type: string
+      example: '+1(234)-567-8910'
+    BuyMuseumTicketsRequest:
+      description: Request payload used for purchasing museum tickets.
+      type: object
+      properties:
+        ticketType:
+          $ref: "#/components/schemas/TicketType"
+        eventId:
+          description: Unique identifier for a special event. Required if purchasing tickets for the museum's special events.
+          $ref: "#/components/schemas/EventId"
+        ticketDate:
+          description: Date that the ticket is valid for.
+          $ref: "#/components/schemas/Date"
+        email:
+          $ref: "#/components/schemas/Email"
+        phone:
+          $ref: "#/components/schemas/Phone"
+      required:
+        - ticketType
+        - ticketDate
+        - email
+    TicketMessage:
+      description: Confirmation message after a ticket purchase.
+      type: string
+      example: Museum general entry ticket purchased
+    TicketId:
+      description: Unique identifier for museum ticket. Generated when purchased.
+      type: string
+      format: uuid
+      example: a54a57ca-36f8-421b-a6b4-2e8f26858a4c
+    TicketConfirmation:
+      description: Unique confirmation code used to verify ticket purchase.
+      type: string
+      example: 'ticket-event-a98c8f-7eb12'
+    BuyMuseumTicketsResponse:
+      description: Details for a museum ticket after a successful purchase.
+      type: object
+      properties:
+        message:
+          $ref: "#/components/schemas/TicketMessage"
+        eventName:
+          $ref: "#/components/schemas/EventName"
+        ticketId:
+          $ref: "#/components/schemas/TicketId"
+        ticketType:
+          $ref: "#/components/schemas/TicketType"
+        ticketDate:
+          description: Date the ticket is valid for.
+          $ref: "#/components/schemas/Date"
+        confirmationCode:
+          $ref: "#/components/schemas/TicketConfirmation"
+      required:
+        - message
+        - ticketId
+        - ticketType
+        - ticketDate
+        - confirmationCode
+    GetTicketCodeResponse:
+      description: Image of a ticket with a QR code used for museum or event entry.
+      type: string
+      format: binary
+    GetMuseumHoursResponse:
+      description: List of museum operating hours for consecutive days.
+      type: array
+      items:
+        $ref: "#/components/schemas/MuseumDailyHours"
+    MuseumDailyHours:
+      description: Daily operating hours for the museum.
+      type: object
+      properties:
+        date:
+          description: Date the operating hours apply to.
+          $ref: "#/components/schemas/Date"
+          example: '2024-12-31'
+        timeOpen:
+          type: string
+          pattern: '^([01]\d|2[0-3]):?([0-5]\d)$'
+          description: Time the museum opens on a specific date. Uses 24 hour time format (`HH:mm`).
+          example: 09:00
+        timeClose:
+          description: Time the museum closes on a specific date. Uses 24 hour time format (`HH:mm`).
+          type: string
+          pattern: '^([01]\d|2[0-3]):?([0-5]\d)$'
+          example: 18:00
+      required:
+        - date
+        - timeOpen
+        - timeClose
+    EventId:
+      description: Identifier for a special event.
+      type: string
+      format: uuid
+      example: 3be6453c-03eb-4357-ae5a-984a0e574a54
+    EventName:
+      type: string
+      description: Name of the special event.
+      example: Pirate Coding Workshop
+    EventLocation:
+      type: string
+      description: Location where the special event is held.
+      example: Computer Room
+    EventDescription:
+      type: string
+      description: Description of the special event.
+      example: Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).
+    EventDates:
+      type: array
+      items:
+        $ref: "#/components/schemas/Date"
+      description: List of planned dates for the special event.
+    EventPrice:
+      description: Price of a ticket for the special event.
+      type: number
+      format: float
+      example: 25
+    CreateSpecialEventRequest:
+      description: Request payload for creating new special events at the museum.
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/EventName"
+        location:
+          $ref: "#/components/schemas/EventLocation"
+        eventDescription:
+          $ref: "#/components/schemas/EventDescription"
+        dates:
+          $ref: "#/components/schemas/EventDates"
+        price:
+          $ref: "#/components/schemas/EventPrice"
+      required:
+        - name
+        - location
+        - eventDescription
+        - dates
+        - price
+    UpdateSpecialEventRequest:
+      description: Request payload for updating an existing special event. Only included fields are updated in the event.
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/EventName"
+        location:
+          $ref: "#/components/schemas/EventLocation"
+        eventDescription:
+          $ref: "#/components/schemas/EventDescription"
+        dates:
+          $ref: "#/components/schemas/EventDates"
+        price:
+          $ref: "#/components/schemas/EventPrice"
+    ListSpecialEventsResponse:
+      description: List of upcoming special events.
+      type: array
+      items:
+        $ref: "#/components/schemas/SpecialEventResponse"
+    SpecialEventResponse:
+      description: Information about a special event.
+      type: object
+      properties:
+        eventId:
+          $ref: "#/components/schemas/EventId"
+        name:
+          $ref: "#/components/schemas/EventName"
+        location:
+          $ref: "#/components/schemas/EventLocation"
+        eventDescription:
+          $ref: "#/components/schemas/EventDescription"
+        dates:
+          $ref: "#/components/schemas/EventDates"
+        price:
+          $ref: "#/components/schemas/EventPrice"
+      required:
+        - eventId
+        - name
+        - location
+        - eventDescription
+        - dates
+        - price
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+          example: object
+        title:
+          type: string
+          example: Validation failed
+
   securitySchemes:
-    basicAuth:
+    MuseumPlaceholderAuth:
       type: http
       scheme: basic
+  examples:
+    BuyGeneralTicketsRequestExample:
+      summary: General entry ticket
+      value:
+        ticketType: general
+        ticketDate: '2023-09-07'
+        email: todd@example.com
+    BuyEventTicketsRequestExample:
+      summary: Special event ticket
+      value:
+        ticketType: general
+        eventId: dad4bce8-f5cb-4078-a211-995864315e39
+        ticketDate: '2023-09-05'
+        email: todd@example.com
+    BuyGeneralTicketsResponseExample:
+      summary: General entry ticket
+      value:
+        message: Museum general entry ticket purchased
+        ticketId: 382c0820-0530-4f4b-99af-13811ad0f17a
+        ticketType: general
+        ticketDate: '2023-09-07'
+        confirmationCode: ticket-general-e5e5c6-dce78
+    BuyEventTicketsResponseExample:
+      summary: Special event ticket
+      value:
+        message: Museum special event ticket purchased
+        ticketId: b811f723-17b2-44f7-8952-24b03e43d8a9
+        eventName: Mermaid Treasure Identification and Analysis
+        ticketType: event
+        ticketDate: '2023-09-05'
+        confirmationCode: ticket-event-9c55eg-8v82a
+    CreateSpecialEventRequestExample:
+      summary: Create special event
+      value:
+        name: Mermaid Treasure Identification and Analysis
+        location: Under the seaaa 🦀 🎶 🌊.
+        eventDescription: Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.
+        dates:
+          - '2023-09-05'
+          - '2023-09-08'
+        price: 0
+    CreateSpecialEventResponseExample:
+      summary: Special event created
+      value:
+        eventId: dad4bce8-f5cb-4078-a211-995864315e39
+        name: Mermaid Treasure Identification and Analysis
+        location: Under the seaaa 🦀 🎶 🌊.
+        eventDescription: Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.
+        dates:
+          - '2023-09-05'
+          - '2023-09-08'
+        price: 30
+    GetSpecialEventResponseExample:
+      summary: Get special event
+      value:
+        eventId: 6744a0da-4121-49cd-8479-f8cc20526495
+        name: Time Traveler Tea Party
+        location: Temporal Tearoom
+        eventDescription: Sip tea with important historical figures.
+        dates:
+          - '2023-11-18'
+          - '2023-11-25'
+          - '2023-12-02'
+        price: 60
+    ListSpecialEventsResponseExample:
+      summary: List of special events
+      value:
+        - eventId: f3e0e76e-e4a8-466e-ab9c-ae36c15b8e97
+          name: Sasquatch Ballet
+          location: Seattle... probably
+          eventDescription: They're big, they're hairy, but they're also graceful. Come learn how the biggest feet can have the lightest touch.
+          dates:
+            - '2023-12-15'
+            - '2023-12-22'
+          price: 40
+        - eventId: 2f14374a-9c65-4ee5-94b7-fba66d893483
+          name: Solar Telescope Demonstration
+          location: Far from the sun.
+          eventDescription: Look at the sun without going blind!
+          dates:
+            - '2023-09-07'
+            - '2023-09-14'
+          price: 50
+        - eventId: 6aaa61ba-b2aa-4868-b803-603dbbf7bfdb
+          name: Cook like a Caveman
+          location: Fire Pit on East side
+          eventDescription: Learn to cook on an open flame.
+          dates:
+            - '2023-11-10'
+            - '2023-11-17'
+            - '2023-11-24'
+          price: 5
+        - eventId: 602b75e1-5696-4ab8-8c7a-f9e13580f910
+          name: Underwater Basket Weaving
+          location: Rec Center Pool next door.
+          eventDescription: Learn to weave baskets underwater.
+          dates:
+            - '2023-09-12'
+            - '2023-09-15'
+          price: 15
+        - eventId: dad4bce8-f5cb-4078-a211-995864315e39
+          name: Mermaid Treasure Identification and Analysis
+          location: Room Sea-12
+          eventDescription: Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits — kindly donated by Ariel.
+          dates:
+            - '2023-09-05'
+            - '2023-09-08'
+          price: 30
+        - eventId: 6744a0da-4121-49cd-8479-f8cc20526495
+          name: Time Traveler Tea Party
+          location: Temporal Tearoom
+          eventDescription: Sip tea with important historical figures.
+          dates:
+            - '2023-11-18'
+            - '2023-11-25'
+            - '2023-12-02'
+          price: 60
+        - eventId: 3be6453c-03eb-4357-ae5a-984a0e574a54
+          name: Pirate Coding Workshop
+          location: Computer Room
+          eventDescription: Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).
+          dates:
+            - '2023-10-29'
+            - '2023-10-30'
+            - '2023-10-31'
+          price: 45
+        - eventId: 9d90d29a-2af5-4206-97d9-9ea9ceadcb78
+          name: Llama Street Art Through the Ages
+          location: Auditorium
+          eventDescription: Llama street art?! Alpaca my bags -- let's go!
+          dates:
+            - '2023-10-29'
+            - '2023-10-30'
+            - '2023-10-31'
+          price: 45
+        - eventId: a3c7b2c4-b5fb-4ef7-9322-00a919864957
+          name: The Great Parrot Debate
+          location: Outdoor Amphitheatre
+          eventDescription: See leading parrot minds discuss important geopolitical issues.
+          dates:
+            - '2023-11-03'
+            - '2023-11-10'
+          price: 35
+        - eventId: b92d46b7-4c5d-422b-87a5-287767e26f29
+          name: Eat a Bunch of Corn
+          location: Cafeteria
+          eventDescription: We accidentally bought too much corn. Please come eat it.
+          dates:
+            - '2023-11-10'
+            - '2023-11-17'
+            - '2023-11-24'
+          price: 5
+    UpdateSpecialEventRequestExample:
+      summary: Update special event request
+      value:
+        location: On the beach.
+        price: 15
+    UpdateSpecialEventResponseExample:
+      summary: Update special event
+      value:
+        eventId: dad4bce8-f5cb-4078-a211-995864315e39
+        name: Mermaid Treasure Identification and Analysis
+        location: On the beach.
+        eventDescription: Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.
+        dates:
+          - '2023-09-05'
+          - '2023-09-08'
+        price: 15
+    GetMuseumHoursResponseExample:
+      summary: Get hours response
+      value:
+        - date: "2023-09-11"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-12"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-13"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-14"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-15"
+          timeOpen: "10:00"
+          timeClose: "16:00"
+        - date: "2023-09-18"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-19"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-20"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-21"
+          timeOpen: "09:00"
+          timeClose: "18:00"
+        - date: "2023-09-22"
+          timeOpen: "10:00"
+          timeClose: "16:00"
   parameters:
-    x-correlation-id:
-      description: >-
-        The `X-Correlation-Id` provides a unique identifier for this request
-        between a client and server.
-      name: X-Correlation-Id
-      in: header
-      required: false
-      schema:
-        type: string
-        format: uuid
-    x-force-id:
-      description: >
-        The `X-Force-Id` provides the SOH Brand ID for the calling site. For
-        forces this will be the PNC Code but for atypical sites it will be an
-        SOH defined value.
-      x-summary: |
-        The available values are defined: 
-
-         | Force / Dept.                            | SOH brand ID |
-         | ---------------------------------------- | ------------ |
-         | Avon & Somerset Constabulary             | 52           |
-         | Bedfordshire Police                      | 40           |
-         | British Transport Police                 | 93           |
-         | Cambridgeshire Constabulary              | 35           |
-         | Cheshire Constabulary                    | 7            |
-         | City of London Police                    | 48           |
-         | Cleveland Police                         | 17           |
-         | Cumbria Constabulary                     | 3            |
-         | Derbyshire Constabulary                  | 30           |
-         | Devon & Cornwall Police                  | 50           |
-         | Dorset Police                            | 55           |
-         | Durham Constabulary                      | 11           |
-         | Dyfed-Powys Police                       | 63           |
-         | Essex Police                             | 42           |
-         | Gloucestershire Constabulary             | 53           |
-         | Greater Manchester Police                | 6            |
-         | Guernsey Police                          | 56           |
-         | Gwent Police                             | 61           |
-         | Hampshire and Isle of Wight Constabulary | 44           |
-         | Hertfordshire Constabulary               | 41           |
-         | Humberside Police                        | 16           |
-         | Isle of Man Constabulary                 | 97           |
-         | Kent Police                              | 46           |
-         | Lancashire Constabulary                  | 4            |
-         | Leicestershire Constabulary              | 33           |
-         | Lincolnshire Police                      | 32           |
-         | Merseyside Police                        | 5            |
-         | Metropolitan Police                      | 1            |
-         | Norfolk Constabulary                     | 36           |
-         | North Wales Police                       | 60           |
-         | North Yorkshire Police                   | 12           |
-         | Northamptonshire Police                  | 34           |
-         | Northumbria Police                       | 10           |
-         | Nottinghamshire Police                   | 31           |
-         | Police Service of Northern Ireland       | 98           |
-         | South Wales Police                       | 62           |
-         | South Yorkshire Police                   | 14           |
-         | Staffordshire Police                     | 21           |
-         | States of Jersey Police                  | 57           |
-         | Suffolk Constabulary                     | 37           |
-         | Surrey Police                            | 45           |
-         | Sussex Police                            | 47           |
-         | Thames Valley Police                     | 43           |
-         | Warwickshire Police                      | 23           |
-         | West Mercia Police                       | 22           |
-         | West Midlands Police                     | 20           |
-         | West Yorkshire Police                    | 13           |
-         | Wiltshire Police                         | 54           |
-         | police.uk                                | 150          |
-         | Kent PCC                                 | 89           |
-         | Cheshire PCC                             | 90           |
-         | Wiltshire PCC                            | 154          |
-         | NABIS                                    | 153          |
-         | Met - hardest call                       | 500          |
-         | Herts PCC                                | 300          |
-         | NPCC                                     | 155          |
-         | Cambs PCC                                | 350          |
-         | Regional organised crime units           | 111          |
-         | Gloucestershire PCC                      | 400          |
-         | Beds PCC                                 | 450          |
-      name: X-Force-Id
-      in: header
-      required: true
+    PaginationPage:
+      name: page
+      in: query
+      description: Page number to retrieve.
       schema:
         type: integer
-        minimum: 1
-        maximum: 1000
-      allowEmptyValue: false
-    crime-id:
-      description: The `crime-id` provides the the NMPP crime ID for a crime.
-      name: crime-id
-      in: path
-      required: true
-      schema:
-        type: string
-    page-size:
-      description: The `page-size` parameter indicates the number of records to return
-      name: page-size
+        default: 1
+        example: 2
+    PaginationLimit:
+      name: limit
       in: query
-      required: false
-      allowEmptyValue: false
+      description: Number of days per page.
       schema:
         type: integer
         default: 10
-        enum:
-          - 10
-          - 100
-          - 1000
-    event-id:
-      description: The `event-id` provides a unique identifier for the event.
-      name: event-id
+        maximum: 30
+        example: 15
+    EventId:
+      name: eventId
       in: path
+      description: Identifier for a special event.
       required: true
       schema:
         type: string
         format: uuid
-  schemas:
-    timestamp:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/timestamp.json
-      title: Timestamp
-      description: A Timestamp
-      examples:
-        - '2020-03-21T13:25:01Z'
-      type: string
-      format: date-time
-    report-status:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/report/definitions/report-status.json
-      description: Report Status
-      enum:
-        - CAST_0001
-        - CAST_0002
-      x-enumDescriptions:
-        CAST_0001: Open
-        CAST_0002: Closed
-    crime-type:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/crime/definitions/crime-type.json
-      title: crime-type
-      type: object
-      required:
-        - category
-      properties:
-        category:
-          description: Crime Category
-          enum:
-            - CRCA_0001
-            - CRCA_0002
-            - CRCA_0003
-            - CRCA_0004
-            - CRCA_0005
-            - CRCA_0006
-            - CRCA_0007
-            - CRCA_0008
-            - CRCA_0009
-            - CRCA_0010
-            - CRCA_0011
-            - CRCA_0012
-            - CRCA_0013
-            - CRCA_0014
-            - CRCA_0015
-            - CRCA_0016
-            - CRCA_0017
-          x-enumDescriptions:
-            CRCA_0001: Arson
-            CRCA_0002: Assault
-            CRCA_0003: Burglary
-            CRCA_0004: Controlling or Coercive Behaviour
-            CRCA_0005: Criminal Damage
-            CRCA_0006: Fraud
-            CRCA_0007: Modern Slavery
-            CRCA_0008: Rape
-            CRCA_0009: REX
-            CRCA_0010: Robbery
-            CRCA_0011: Sexual Assault
-            CRCA_0012: Sexual Offence
-            CRCA_0013: Stalking and Harassment
-            CRCA_0014: Theft
-            CRCA_0015: Vehicle Offence
-            CRCA_0016: Vehicle Crime
-            CRCA_0017: Weapons Threat
-        code:
-          description: Home Office Crime Category
-          examples:
-            - 001/01
-            - 001/01
-            - 001/02
-            - 002/00
-            - 002/00
-            - 003/01
-          type: string
-          minLength: 1
-    crime-reference:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/crime/definitions/crime-reference.json
-      description: Crime reference number
-      type: string
-      maxLength: 100
-      minLength: 1
-    reference:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/definitions/reference.json
-      title: Reference
-      description: >-
-        Reference provided to NMPP by forces for the entity. If supplied this
-        will be returned back to allow for easier integration on the force end.
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          description: System reference ID
-          type: string
-        system:
-          description: System of Record
-          type: string
-    timespan:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/timespan.json
-      title: Timespan
-      description: >-
-        A timespan when an event occurred. Requires a `from` timestamp but can
-        be open ended
-      examples:
-        - from: '2024-02-01T12:10:01Z'
-          to: '2024-02-03T12:10:01Z'
-        - from: '2024-02-01T12:10:01Z'
-      type: object
-      required:
-        - from
-      properties:
-        from:
-          $ref: '#/components/schemas/timestamp'
-        to:
-          $ref: '#/components/schemas/timestamp'
-    crime-stage:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/crime/definitions/crime-stage.json
-      title: Crime Stage
-      description: NMPP Crime Stages
-      enum:
-        - CRST_0001
-        - CRST_0002
-        - CRST_0003
-      x-enumDescriptions:
-        CRST_0001: Crime Reported
-        CRST_0002: Under Investigation
-        CRST_0003: Crime Closed
-    crime-details:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/crime/definitions/crime-details.json
-      description: Crime Details
-      type: object
-      required:
-        - type
-        - crimeReference
-        - stage
-      properties:
-        type:
-          $ref: '#/components/schemas/crime-type'
-        crimeReference:
-          $ref: '#/components/schemas/crime-reference'
-        externalReference:
-          type: array
-          items:
-            $ref: '#/components/schemas/reference'
-        occurredAt:
-          $ref: '#/components/schemas/timespan'
-        stage:
-          $ref: '#/components/schemas/crime-stage'
-    person-name:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/definitions/person-name.json
-      title: Person Name
-      description: Basic person naming properties
-      properties:
-        familyName:
-          description: Family name of the person.
-          examples:
-            - Smith
-          type: string
-          maxLength: 50
-          minLength: 1
-        givenName:
-          description: Given name of the person
-          examples:
-            - David
-            - Bill
-          type: string
-          maxLength: 50
-          minLength: 1
-      x-tags:
-        - Person
-    dob:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/dob.json
-      title: Date of Birth
-      examples:
-        - '1980-01-01'
-        - '1995-12-30'
-      type: string
-      format: date
-    email:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/email.json
-      title: Email Address
-      examples:
-        - test.user@example.com
-      type: string
-      format: email
-    telephone:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/telephone.json
-      title: Telephone
-      description: Telephone number formatted in E.164 format
-      examples:
-        - '+447700900000'
-        - '+14047241937'
-      type: string
-      pattern: ^\+[1-9]\d{1,14}$
-    person:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/definitions/person.json
-      title: Person
-      description: Representation of a basic person
-      allOf:
-        - $ref: '#/components/schemas/person-name'
-        - type: object
-          properties:
-            dateOfBirth:
-              $ref: '#/components/schemas/dob'
-            email:
-              $ref: '#/components/schemas/email'
-            phone:
-              $ref: '#/components/schemas/telephone'
-      x-tags:
-        - Person
-    officer:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/definitions/officer.json
-      title: Officer
-      description: Representation of a basic officer
-      allOf:
-        - $ref: '#/components/schemas/person-name'
-        - title: Officer Details
-          type: object
-          required:
-            - badgeNumber
-            - rank
-          properties:
-            badgeNumber:
-              description: >-
-                Officer badge number, also known in forces as a collar number or
-                a warrant number
-              examples:
-                - DS123
-              type: string
-              minLength: 1
-            rank:
-              description: Officers rank or role
-              examples:
-                - Constable
-                - Detective Inspector
-              type: string
-              minLength: 1
-      required:
-        - givenName
-        - familyName
-        - rank
-        - badgeNumber
-      x-tags:
-        - Person
-    temporal:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/temporal.json
-      title: Temporal Data
-      type: object
-      required:
-        - createdAt
-      properties:
-        createdAt:
-          description: Timestamp when the entity was created
-          $ref: '#/components/schemas/timestamp'
-        updatedAt:
-          description: Timestamp when the entity was updated
-          $ref: '#/components/schemas/timestamp'
-    crime-resource:
-      description: Crime Resource
-      title: Crime Resource
-      allOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              const: crime
-            attributes:
-              allOf:
-                - type: object
-                  properties:
-                    reportedAt:
-                      $ref: '#/components/schemas/timestamp'
-                    messagingEnabled:
-                      description: Flag to indicate if messaging is enabled for the crime
-                      type: boolean
-                    status:
-                      $ref: '#/components/schemas/report-status'
-                    crimeDetails:
-                      $ref: '#/components/schemas/crime-details'
-                    victim:
-                      $ref: '#/components/schemas/person'
-                    officerInReport:
-                      $ref: '#/components/schemas/officer'
-                - $ref: '#/components/schemas/temporal'
-          required:
-            - type
-            - attributes
-    meta:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/jsonapi/v1/definitions/meta.json
-      title: Meta
-      description: Additional Metadata related to the resource
-      type: object
-      additionalProperties: true
-    link:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/jsonapi/v1/definitions/link.json
-      title: Link
-      type: object
-      required:
-        - href
-      properties:
-        title:
-          description: >-
-            a string which serves as a label for the destination of a link such
-            that it can be used as a human-readable identifier (e.g., a menu
-            entry).
-          type: string
-        type:
-          description: a string indicating the media type of the link’s target.
-          type: string
-        describedBy:
-          description: >-
-            a link to a description document (e.g. OpenAPI or JSON Schema) for
-            the link target.
-          type: string
-        href:
-          description: >-
-            a string whose value is a URI-reference [RFC3986 Section
-            4.1](https://tools.ietf.org/html/rfc3986#section-4.1) pointing to
-            the link’s target.
-          type: string
-        hreflang:
-          description: >-
-            a string or an array of strings indicating the language(s) of the
-            link’s target. An array of strings indicates that the link’s target
-            is available in multiple languages. Each string MUST be a valid
-            language tag [RFC5646].
-          oneOf:
-            - type: string
-            - type: array
-              items:
-                type: string
-        meta:
-          $ref: '#/components/schemas/meta'
-        rel:
-          description: a string indicating the link’s relation type
-          type: string
-    links:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/jsonapi/v1/definitions/links.json
-      title: Links
-      description: >
-        Where specified, a links member can be used to represent links. The
-        value of this member MUST be an object (a “links object”).
-      type: object
-      additionalProperties:
-        oneOf:
-          - type: string
-          - $ref: '#/components/schemas/link'
-      example:
-        related:
-          title: Comments
-          describedby: http://example.com/schemas/article-comments
-          href: http://example.com/articles/1/comments
-          meta:
-            count: 10
-        self: http://example.com/articles/1/relationships/comments
-    error-source:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/jsonapi/v1/definitions/error-source.json
-      title: Error Source
-      type: object
-      properties:
-        header:
-          description: a string indicating which header caused the error.
-          type: string
-          minLength: 1
-        parameter:
-          description: a string indicating which URI query parameter caused the error.
-          type: string
-          minLength: 1
-        pointer:
-          description: >-
-            a JSON Pointer [RFC6901] to the associated entity in the request
-            document [e.g. "/data" for a primary data object, or
-            "/data/attributes/title" for a specific attribute].
-          type: string
-          minLength: 1
-    error:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/jsonapi/v1/definitions/error.json
-      title: Error
-      type: object
-      minProperties: 1
-      properties:
-        id:
-          description: a unique identifier for this particular occurrence of the problem.
-          type: string
-          minLength: 1
-        title:
-          description: >-
-            a short, human-readable summary of the problem that SHOULD NOT
-            change from occurrence to occurrence of the problem, except for
-            purposes of localization.
-          type: string
-          minLength: 1
-        code:
-          description: an application-specific error code, expressed as a string value.
-          type: string
-          minLength: 1
-        detail:
-          description: >-
-            a human-readable explanation specific to this occurrence of the
-            problem.
-          type: string
-          minLength: 1
-        links:
-          $ref: '#/components/schemas/links'
-        meta:
-          $ref: '#/components/schemas/meta'
-        source:
-          $ref: '#/components/schemas/error-source'
-        status:
-          description: >-
-            the HTTP status code applicable to this problem, expressed as a
-            string value.
-          type: string
-          minLength: 1
-    document-error:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/jsonapi/v1/document-error.json
-      title: Error Document
-      description: 'JSON:API Error Document indicating an error has occured '
-      type: object
-      minProperties: 1
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/error'
-        links:
-          $ref: '#/components/schemas/links'
-        meta:
-          $ref: '#/components/schemas/meta'
-      x-tags:
-        - JSON:API
-    message-event-type:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/messaging/definitions/message-event-type.json
-      title: Message Event Type
-      description: Message Event Type
-      enum:
-        - MSET_0001
-        - MSET_0002
-      x-enumDescriptions:
-        MSET_0001: Inbound message sent from a force
-        MSET_0002: Outbound message sent from member of public
-    message-detail:
-      $schema: http://json-schema.org/draft-07/schema
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/messaging/definitions/message-detail.json
-      title: Message Detail
-      description: Body of the message
-      type: string
-      maxLength: 2000
-      minLength: 1
-    message:
-      $schema: http://json-schema.org/draft-07/schema
-      $id: https://schema.ihub.police.uk/v1/nmpp/messaging/message.json
-      title: Message
-      type: object
-      required:
-        - type
-        - detail
-      properties:
-        type:
-          $ref: '#/components/schemas/message-event-type'
-        detail:
-          $ref: '#/components/schemas/message-detail'
-        timestamp:
-          description: Time the message was sent
-          $ref: '#/components/schemas/timestamp'
-      x-tags:
-        - Messaging
-    inbound-message-resource:
-      title: Inbound message sent from a force
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-            type:
-              const: message
-            attributes:
-              allOf:
-                - $ref: '#/components/schemas/message'
-                - type: object
-                  properties:
-                    type:
-                      enum:
-                        - MSET_0001
-                      x-enumDescriptions:
-                        MSET_0001: Inbound message sent from a force
-    force-id:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/soh/definitions/force-id.json
-      title: Force Id
-      description: >-
-        Force Identifier, this is usually the force PNC Code but could be an ID
-        provided by SOH. 
-      examples:
-        - 1
-        - 14
-        - 42
-        - 150
-      type: integer
-      maximum: 1000
-      minimum: 1
-    profile-login:
-      $schema: http://json-schema.org/draft-07/schema
-      $id: >-
-        https://schema.ihub.police.uk/v1/soh/profile/definitions/profile-login.json
-      type: object
-      required:
-        - primaryEmailAddress
-        - primaryEmailAddressVerified
-      properties:
-        primaryEmailAddress:
-          description: Primay email Address of the user from the source IdP
-          readOnly: true
-          $ref: '#/components/schemas/email'
-        primaryEmailAddressVerified:
-          description: >-
-            Flag to indicate if the primary email address is verified. This must
-            always be true as the primary email is from the iDP 
-          const: true
-        primaryPhoneNumber:
-          description: Verified Phone Number of the user from the source IdP
-          readOnly: true
-          $ref: '#/components/schemas/telephone'
-        primaryPhoneNumberVerified:
-          description: >-
-            Flag to indicate if the primary phone number is verified. This will
-            be true if SMS is used for MFA
-          type: boolean
-    notification-preferences:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/dpc/definitions/notification-preferences.json
-      title: Notification preferences
-      description: Entity to define the notification preferences for a profile or report
-      type: object
-      properties:
-        email:
-          description: Receive email notifications
-          default: true
-          type: boolean
-        sms:
-          description: Receive SMS notifications
-          default: true
-          type: boolean
-    profile-notifications:
-      $schema: http://json-schema.org/draft-07/schema
-      $id: >-
-        https://schema.ihub.police.uk/v1/soh/profile/definitions/profile-notifications.json
-      type: object
-      properties:
-        preferences:
-          $ref: '#/components/schemas/notification-preferences'
-    profile-personal-details:
-      $schema: http://json-schema.org/draft-07/schema
-      $id: >-
-        https://schema.ihub.police.uk/v1/soh/profile/definitions/profile-personal-details.json
-      type: object
-      properties:
-        dateOfBirth:
-          description: Date of birth
-          type: string
-          format: date
-    profile:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/soh/profile/profile.json
-      title: Profile
-      description: Data for an SOH user profile
-      type: object
-      required:
-        - login
-        - notifications
-        - personalDetails
-      properties:
-        login:
-          $ref: '#/components/schemas/profile-login'
-        notifications:
-          $ref: '#/components/schemas/profile-notifications'
-        personalDetails:
-          $ref: '#/components/schemas/profile-personal-details'
-      x-tags:
-        - Profile
-    sub:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/dpc/definitions/sub.json
-      title: Sub
-      description: The local user ID for a cognito user.
-      examples:
-        - 2e675a89-eeea-4ff8-a934-c85d2514c585
-      type: string
-      pattern: >-
-        ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
-    crime-message:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/events/messaging/definitions/crime-message.json
-      title: Crime / Message Payload
-      type: object
-      required:
-        - forceId
-        - profile
-        - crime
-        - message
-        - sub
-        - timestamp
-      properties:
-        crime:
-          $ref: '#/components/schemas/crime-details'
-        forceId:
-          $ref: '#/components/schemas/force-id'
-        message:
-          $ref: '#/components/schemas/message'
-        profile:
-          $ref: '#/components/schemas/profile'
-        sub:
-          $ref: '#/components/schemas/sub'
-        timestamp:
-          $ref: '#/components/schemas/timestamp'
-    crime-message-event:
-      title: Crime Message Event
-      allOf:
-        - $ref: '#/components/schemas/crime-message'
-        - type: object
-          properties:
-            type:
-              enum:
-                - MSET_0002
-              x-enumDescriptions:
-                MSET_0002: Outbound message sent from member of public
-    crime:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: https://schema.ihub.police.uk/v1/nmpp/crime/crime.json
-      title: Crime
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/crime-details'
-        - type: object
-          properties:
-            officerInReport:
-              $ref: '#/components/schemas/officer'
-            victim:
-              allOf:
-                - $ref: '#/components/schemas/person'
-                - type: object
-                  properties:
-                    externalReference:
-                      $ref: '#/components/schemas/reference'
-              required:
-                - dateOfBirth
-                - email
-                - phone
-      required:
-        - victim
-      x-tags:
-        - Crime
-    crime-profile:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/events/crime/definitions/crime-profile.json
-      title: Crime / Profile Payload
-      type: object
-      required:
-        - forceId
-        - profile
-        - crime
-        - sub
-        - timestamp
-      properties:
-        crime:
-          $ref: '#/components/schemas/crime'
-        forceId:
-          $ref: '#/components/schemas/force-id'
-        profile:
-          $ref: '#/components/schemas/profile'
-        sub:
-          $ref: '#/components/schemas/sub'
-        timestamp:
-          $ref: '#/components/schemas/timestamp'
-    profile-event-type:
-      $schema: http://json-schema.org/draft-07/schema#
-      $id: >-
-        https://schema.ihub.police.uk/v1/nmpp/definitions/profile-event-type.json
-      title: profile-event-type
-      enum:
-        - PRET_0001
-        - PRET_0002
-        - PRET_0003
-      x-enumDescriptions:
-        PRET_0001: Profile Associated
-        PRET_0002: Profile Updated
-        PRET_0003: Profile Deleted
-    crime-profile-event:
-      title: Crime Profile Event
-      allOf:
-        - $ref: '#/components/schemas/crime-profile'
-        - type: object
-          properties:
-            type:
-              $ref: '#/components/schemas/profile-event-type'
-    event-resource:
-      description: Event Resource
-      type: object
-      required:
-        - id
-        - type
-        - attributes
-      properties:
-        type:
-          type: string
-          const: event
-        id:
-          type: string
-          format: uuid
-          example: 27d4c8d4-0553-47be-90d7-8f90c04d881a
-        attributes:
-          type: object
-          required:
-            - confirmationHandle
-            - event
-          properties:
-            confirmationHandle:
-              type: string
-              maxLength: 1024
-              minLength: 1
-            event:
-              oneOf:
-                - $ref: '#/components/schemas/crime-message-event'
-                - $ref: '#/components/schemas/crime-profile-event'
-              discriminator:
-                propertyName: type
-                mapping:
-                  MSET_0002: '#/components/schemas/crime-message-event'
-                  PRET_0001: '#/components/schemas/crime-profile-event'
-                  PRET_0002: '#/components/schemas/crime-profile-event'
-                  PRET_0003: '#/components/schemas/crime-profile-event'
-    event-confirmation-resource:
-      description: Payload to confirm an event has successfully been received
-      title: Event confirmation resource
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The ID of the event.
-        type:
-          type: string
-          const: eventConfirmation
-        attributes:
-          type: object
-          required:
-            - eventId
-            - messageHandle
-          properties:
-            eventId:
-              type: string
-              format: uuid
-            messageHandle:
-              type: string
-              maxLength: 1024
-              minLength: 1
-      required:
-        - id
-        - type
-        - attributes
-  requestBodies:
-    create-crime-request:
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/crime-resource'
-                    required:
-                      - id
-                      - type
-                      - attributes
-    create-message-request:
-      content:
-        application/json:
-          examples:
-            inboundMessage:
-              description: Basic message to force
-              value:
-                data:
-                  id: 60f3fd14-6684-47e1-91f4-57e07855961e
-                  type: message
-                  attributes:
-                    detail: Please call the officer.
-                    type: MSET_0001
-                    timestamp: '2025-06-01T12:09:10Z'
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/inbound-message-resource'
-                    required:
-                      - id
-                      - type
-                      - attributes
-    delete-event-request:
-      content:
-        application/json:
-          examples:
-            eventConfirmation:
-              value:
-                data:
-                  id: 13cd2ce5-0a24-4639-bd26-73d06ff33b01
-                  type: eventConfirmation
-                  attributes:
-                    eventId: 13cd2ce5-0a24-4639-bd26-73d06ff33b01
-                    messageHandle: dsfkljo89733jsdkfjjkhdn
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/event-confirmation-resource'
-  headers:
-    x-correlation-id:
-      description: >-
-        The `X-Correlation-Id` provides a unique identifier for this request
-        between a client and server.
-      required: false
+        example: dad4bce8-f5cb-4078-a211-995864315e39
+    StartDate:
+      name: startDate
+      in: query
+      description: Starting date to retrieve future operating hours from. Defaults to today's date.
+      schema:
+        type: string
+        format: date
+        example: '2023-02-23'
+    EndDate:
+      name: endDate
+      in: query
+      description: End of a date range to retrieve special events for. Defaults to 7 days after `startDate`.
+      schema:
+        type: string
+        format: date
+        example: '2023-04-18'
+    TicketId:
+      name: ticketId
+      in: path
+      description: Identifier for a ticket to a museum event. Used to generate ticket image.
+      required: true
       schema:
         type: string
         format: uuid
+        example: a54a57ca-36f8-421b-a6b4-2e8f26858a4c
   responses:
-    errors-response:
-      description: Error Response
-      headers:
-        X-Correlation-ID:
-          $ref: '#/components/headers/x-correlation-id'
+    BadRequest:
+      description: Bad request.
       content:
-        application/json:
-          examples:
-            internal-server-error:
-              summary: Internal Server Error
-              value:
-                errors:
-                  - code: '500'
-                    title: Internal Server Error
-            bad-request-error:
-              summary: Bad request Error
-              value:
-                errors:
-                  - code: '400'
-                    title: Bad Request
-                    source:
-                      header: x-correlation-id
-            unauthorized-error:
-              summary: Unauthorized
-              value:
-                errors:
-                  - code: '401'
-                    title: Unauthorized
+        application/problem+json:
           schema:
-            $ref: '#/components/schemas/document-error'
-    events-response:
-      description: Get Timeline events response
-      headers:
-        X-Correlation-ID:
-          $ref: '#/components/headers/x-correlation-id'
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found.
       content:
-        application/json:
+        application/problem+json:
           schema:
-            allOf:
-              - type: object
-                required:
-                  - data
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/event-resource'
-                  meta:
-                    type: object
-                    additionalProperties: true
-                    properties:
-                      additionalEventsAvailable:
-                        description: Flag to indicate that there are more events available
-                        type: boolean
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+tags:
+  - name: Operations
+    description: Operational information about the museum.
+  - name: Events
+    description: Special events hosted by the museum.
+  - name: Tickets
+    description: Museum tickets for general entrance or special events.
+security:
+  - MuseumPlaceholderAuth: []
