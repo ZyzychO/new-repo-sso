@@ -19,6 +19,7 @@ servers:
 paths:
   /museum-hours:
     get:
+      x-internal: true
       summary: Get museum hours
       description: Get upcoming museum operating hours.
       operationId: getMuseumHours
