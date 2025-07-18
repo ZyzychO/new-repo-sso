@@ -27,3 +27,14 @@ search:
       - name: API guides
         field: redocly_category
         type: multi-select
+metadataGlobs:
+  'featured/**':
+    redocly_category: Featured guides
+  'FAQ/**':
+    redocly_category: FAQs
+  'compliance/**':
+    redocly_category: Compliance
+  'rn/**':
+    redocly_category: Release notes
+  'developer-portal/**':
+    redocly_category: API guides
