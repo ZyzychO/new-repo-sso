@@ -3,3 +3,27 @@ apis:
     root: openapi.yaml
     decorators:
       remove-x-internal: '{{process.env.MY_TEST_VAR}}'
+search:
+  engine: typesense
+  shortcuts:
+    - /
+  filters:
+    facets:
+      - name: Featured guides
+        field: redocly_category
+        type: multi-select
+      - name: Documentation
+        field: redocly_category
+        type: multi-select
+      - name: FAQs
+        field: redocly_category
+        type: multi-select
+      - name: Release notes
+        field: redocly_category
+        type: multi-select
+      - name: Compliance
+        field: redocly_category
+        type: multi-select
+      - name: API guides
+        field: redocly_category
+        type: multi-select
