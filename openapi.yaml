@@ -29583,7 +29583,6 @@ components:
       title: Pre-configured
       type: object
       description: |
-        <br/><br/>
         This approach is useful when you want to use standard reports made available by MeasureOne. The table below depicts the documents and the reports MeasureOne creates for the type of DataRequest created.
 
         | Type | Documents | Service API & Report |
@@ -29598,7 +29597,6 @@ components:
         | RENTERS_INSURANCE_DETAILS | Current & Historic Renters Insurance Policies | get_insurance_details
         | REALIZED_GAINS | 1099_B Composite form | get_realized_gains
 
-        <br/><br/>
       required:
         - individual_id
         - type
