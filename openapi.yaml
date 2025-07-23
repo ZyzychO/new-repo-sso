@@ -29584,44 +29584,19 @@ components:
       type: object
       description: |
         <br/><br/>
-
-        This approach is useful when you want to use standard reports made
-        available by MeasureOne. The table below depicts the documents and the
-        reports MeasureOne creates for the type of DataRequest created.
-
+        This approach is useful when you want to use standard reports made available by MeasureOne. The table below depicts the documents and the reports MeasureOne creates for the type of DataRequest created.
 
         | Type | Documents | Service API & Report |
-
         |--- |----------- |-- |
-
-        | ACADEMIC_SUMMARY | Education related documents including Student
-        Transcripts, Grade Reports, Degree Audit Reports & Student Profile |
-        get_academic_summary
-
-        | ENROLLMENT_STATUS | Enrollment related documents including Student
-        Transcripts, Grade Reports, Degree Audit Reports & Student Profile |
-        get_enrollment_status
-
-        | INCOME_EMPLOYMENT_DETAILS | Income and Employment related documents
-        such as Paystubs, Employee Profile  | get_income_employment_details
-
-        | EMPLOYMENT_SUMMARY | Employment related documents such as Paystubs &
-        Employee Profile | get_employment_summary
-
-        | INCOME_SUMMARY | Income related documents including Paystubs &
-        Employee Profile | get_income_summary
-
-        | HOME_INSURANCE_DETAILS | Current & Historic Home Insurance Policies  |
-        get_insurance_details
-
-        | AUTO_INSURANCE_DETAILS | Current & Historic Auto Insurance Policies |
-        get_insurance_details
-
-        | RENTERS_INSURANCE_DETAILS | Current & Historic Renters Insurance
-        Policies | get_insurance_details
-
+        | ACADEMIC_SUMMARY | Education related documents including Student Transcripts, Grade Reports, Degree Audit Reports & Student Profile | get_academic_summary
+        | ENROLLMENT_STATUS | Enrollment related documents including Student Transcripts, Grade Reports, Degree Audit Reports & Student Profile | get_enrollment_status
+        | INCOME_EMPLOYMENT_DETAILS | Income and Employment related documents such as Paystubs, Employee Profile  | get_income_employment_details
+        | EMPLOYMENT_SUMMARY | Employment related documents such as Paystubs & Employee Profile | get_employment_summary
+        | INCOME_SUMMARY | Income related documents including Paystubs & Employee Profile | get_income_summary
+        | HOME_INSURANCE_DETAILS | Current & Historic Home Insurance Policies  | get_insurance_details
+        | AUTO_INSURANCE_DETAILS | Current & Historic Auto Insurance Policies | get_insurance_details
+        | RENTERS_INSURANCE_DETAILS | Current & Historic Renters Insurance Policies | get_insurance_details
         | REALIZED_GAINS | 1099_B Composite form | get_realized_gains
-
 
         <br/><br/>
       required:
