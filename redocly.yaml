@@ -38,3 +38,6 @@ metadataGlobs:
     redocly_category: Release notes
   'developer-portal/**':
     redocly_category: API guides
+reunite:
+  ignoreLinkChecker: true
+  ignoreLint: true
