@@ -29582,7 +29582,7 @@ components:
     StaticDataRequest:
       title: Pre-configured
       type: object
-      description: >
+      description: |
         <br/><br/>
 
         This approach is useful when you want to use standard reports made
