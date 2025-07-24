@@ -41,3 +41,10 @@ metadataGlobs:
 reunite:
   ignoreLinkChecker: true
   ignoreLint: true
+products:
+  konnect:
+    name: Fynd Konnect
+    folder: konnect/
+  ai-pim:
+    name: Fynd AI PIM
+    folder: ai-pim/
