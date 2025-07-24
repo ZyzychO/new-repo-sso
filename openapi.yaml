@@ -380,8 +380,7 @@ components:
             - $ref: '#/components/schemas/EventName'
             - $ref: '#/components/schemas/LegacyEventName'
             - $ref: '#/components/schemas/CustomEventName'
-      required:
-        - name
+
         location:
           $ref: '#/components/schemas/EventLocation'
         eventDescription:
