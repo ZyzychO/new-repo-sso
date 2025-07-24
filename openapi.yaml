@@ -373,9 +373,15 @@ components:
       example: 25
     CreateSpecialEventRequest:
       description: Request payload for creating new special events at the museum.
+      type: object
       properties:
         name:
-          $ref: '#/components/schemas/EventName'
+          oneOf:
+            - $ref: '#/components/schemas/EventName'
+            - $ref: '#/components/schemas/LegacyEventName'
+            - $ref: '#/components/schemas/CustomEventName'
+      required:
+        - name
         location:
           $ref: '#/components/schemas/EventLocation'
         eventDescription:
