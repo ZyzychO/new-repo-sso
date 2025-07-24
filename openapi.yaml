@@ -221,6 +221,29 @@ paths:
           description: Not found
 components:
   schemas:
+    LegacyEventName:
+      type: string
+      description: >
+        An event name used in legacy systems. Typically uppercase and limited to specific known values.
+      enum:
+        - HERITAGE_DAY
+        - MUSEUM_CLASSIC
+        - FOUNDERS_GALA
+
+    CustomEventName:
+      type: object
+      description: >
+        A custom-defined event name used for new or one-off special events.
+      properties:
+        value:
+          type: string
+          description: The name of the custom event.
+          maxLength: 100
+        createdBy:
+          type: string
+          description: Identifier of the user or system that created the custom event name.
+      required:
+        - value
     TicketType:
       description: Type of ticket being purchased. Use `general` for regular museum entry and `event` for tickets to special events.
       type: string
